@@ -7,7 +7,8 @@ import os.path
 import argparse
 import scripts.file_process as fp
 import torch
-
+from torch.utils.data import DataLoader
+from scripts.dataset_maker import set_maker
 
 def dir_in_dir(path):
     print("Does the zip include images on root or inside folder?")
@@ -55,6 +56,8 @@ def main():
 
     device = torch.device("cuda" if args.cuda else "cpu")
 
+    torch.manual_seed(args.seed)
+
     print("\n ██████ Training and Validation Data Preparation ██████")
     print("Important! Place everything in the same folder, since this code uses relative paths!")
     print("Path input examples: dataset.zip or folder\\dataset.zip")
@@ -68,6 +71,26 @@ def main():
 
     print("\n ██████ Loading Data into Dataset ██████")
 
+    train_set = set_maker(train_dir, 244, args.upscale)
+    valid_set = set_maker(valid_dir, 244, args.upscale)
+    training_data = DataLoader(dataset=train_set, batch_size=args.trainBatchSize, shuffle=True,
+                               num_workers=args.nWorkers)
+    validation_data = DataLoader(dataset=valid_set, batch_size=args.validBatchSize, shuffle=True,
+                               num_workers=args.nWorkers)
+
+    # |-------------------------------------------------------------------------------------------------| #
+    # Until this part, it is very similar to PyTorch-SuperResolution Example on Github
+    # Link: https://github.com/pytorch/examples/tree/master/super_resolution
+    # Changes are the way to acquire data files, their relative directory and how they are
+    # passed to the code. Unlike other solutions, data is dynamically passed (by asking for input)
+    # Rest of the code shows similarity since deviating from the example either resulted in
+    # poor code readability, making an unnecessary wall of text or using additional libraries
+    # such as h5py, numpy and etc.
+    # |-------------------------------------------------------------------------------------------------| #
+    # Next part is modelling a Network with upscale as input, training and validating by using the model,
+    # PyTorch ReLU Network (torch.nn), PyTorch Optimiser (torch.optim) and so on...
+    # |-------------------------------------------------------------------------------------------------| #
+
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser(description="DRRA Project")
@@ -75,8 +98,10 @@ if __name__ == '__main__':
     parser.add_argument('--trainBatchSize', type=int, required=True, help="training batch size")
     parser.add_argument('--validBatchSize', type=int, required=True, help="validation batch size")
     parser.add_argument('--nEpochs', type=int, required=True, help="number of epochs")
-    parser.add_argument('--rate', type=float, required=True, help="learning rate")
+    parser.add_argument('--nWorkers', type=int, default=8, help="number of workers")
+    parser.add_argument('--lr', type=float, required=True, help="learning rate")
     parser.add_argument('--cuda', action='store_true', help="enable cuda?")
+    parser.add_argument('--seed', type=int, default=42, help="random seed to use. Default=42")
     args = parser.parse_args()
 
     print("Input args:" + str(args))
