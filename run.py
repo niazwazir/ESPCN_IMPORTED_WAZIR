@@ -5,10 +5,12 @@
 
 import os.path
 import argparse
-import scripts.file_process as fp
-import torch
 from torch.utils.data import DataLoader
+
+import scripts.file_process as fp
 from scripts.dataset_maker import set_maker
+from scripts.trainer import training
+
 
 def dir_in_dir(path):
     print("Does the zip include images on root or inside folder?")
@@ -50,14 +52,6 @@ def valid_dir_input(root_in):
 
 def main():
 
-    if args.cuda and not torch.cuda.is_available():
-        print("No CUDA supporting GPU found, using CPU")
-        args.cuda = False
-
-    device = torch.device("cuda" if args.cuda else "cpu")
-
-    torch.manual_seed(args.seed)
-
     print("\n ██████ Training and Validation Data Preparation ██████")
     print("Important! Place everything in the same folder, since this code uses relative paths!")
     print("Path input examples: dataset.zip or folder\\dataset.zip")
@@ -78,6 +72,9 @@ def main():
     validation_data = DataLoader(dataset=valid_set, batch_size=args.validBatchSize, shuffle=True,
                                num_workers=args.nWorkers)
 
+    training(args.cuda, args.seed, args.upscale, args.lr,args.nEpochs,
+             training_data, validation_data)
+
     # |-------------------------------------------------------------------------------------------------| #
     # Until this part, it is very similar to PyTorch-SuperResolution Example on Github
     # Link: https://github.com/pytorch/examples/tree/master/super_resolution
@@ -90,6 +87,7 @@ def main():
     # Next part is modelling a Network with upscale as input, training and validating by using the model,
     # PyTorch ReLU Network (torch.nn), PyTorch Optimiser (torch.optim) and so on...
     # |-------------------------------------------------------------------------------------------------| #
+
 
 
 if __name__ == '__main__':

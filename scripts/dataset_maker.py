@@ -34,7 +34,7 @@ def round_crop_size(crop_size, upscale):
 def input_transform(crop_size, upscale):
     return Compose([
         CenterCrop(crop_size),
-        Resize(crop_size / upscale),
+        Resize(crop_size // upscale),
         ToTensor(),
     ])
 
