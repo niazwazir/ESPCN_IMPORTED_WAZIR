@@ -98,7 +98,7 @@ def main():
     for epoch in range(args.nEpochs):
         epoch_loss = 0
         iteration = 0
-        f = open("epoch_%i.log" % epoch, 'w')
+        f = open("epoch_%i.log" % (epoch+1), 'w')
         for data in training_data:
             input, label = data
 
@@ -130,9 +130,9 @@ def main():
                 mse = criterion(prediction, label)
                 psnr = 10 * log10(1 / mse.item())
                 avg_psnr += psnr
-        f1.write("Average PSNR of Epoch [%i]: %0.4f dB \n" % (epoch, (avg_psnr / len(training_data))))
+        f1.write("Average PSNR of Epoch [%i]: %0.4f dB \n" % (epoch+1, (avg_psnr / len(training_data))))
 
-        model_name = "epoch_%i_model.pth" % epoch+1
+        model_name = "epoch_%i_model.pth" % (epoch+1)
         torch.save(model, model_name)
         print("Epoch (%i/%i) is done! See root dir for logs and models" % (epoch+1, args.nEpochs))
     f1.close()
