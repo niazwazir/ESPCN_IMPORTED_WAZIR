@@ -7,6 +7,12 @@ import os.path
 import argparse
 from torch.utils.data import DataLoader
 
+import torch
+import torch.nn as nn
+import torch.optim as optim
+from scripts.nnet_model import ESPCN
+from math import log10
+
 import scripts.file_process as fp
 from scripts.dataset_maker import set_maker
 from scripts.trainer import training
@@ -72,8 +78,64 @@ def main():
     validation_data = DataLoader(dataset=valid_set, batch_size=args.validBatchSize, shuffle=True,
                                num_workers=args.nWorkers)
 
-    training(args.cuda, args.seed, args.upscale, args.lr,args.nEpochs,
-             training_data, validation_data)
+    #training(args.cuda, args.seed, args.upscale, args.lr,args.nEpochs,
+    #         training_data, validation_data)
+
+    if args.cuda and not torch.cuda.is_available():
+        print("No CUDA supporting GPU found, using CPU")
+        cuda_in = False
+    else:
+        cuda_in = True
+
+    device = torch.device("cuda" if cuda_in else "cpu")
+
+    torch.manual_seed(args.seed)
+    model = ESPCN(args.upscale, 1).to(device)  # 1 is for number of channels
+    criterion = nn.MSELoss()
+    optimiser = optim.Adam(model.parameters(), lr=args.lr)
+
+    f1 = open("PSNR_value_list.log", 'w')
+    for epoch in range(args.nEpochs):
+        epoch_loss = 0
+        iteration = 0
+        f = open("epoch_%i.log" % epoch, 'w')
+        for data in training_data:
+            input, label = data
+
+            input = input.to(device)
+            label = label.to(device)
+
+            loss = criterion(model(input), label)
+
+            optimiser.zero_grad()
+
+            epoch_loss += loss.item()
+            loss.backward()
+            optimiser.step()
+            f.write("Iteration [%i/%i]: Loss: %0.4f \n" % (iteration+1, len(training_data), loss.item()))
+            iteration += 1
+        f.write("-----------------------------------\n")
+        f.write("Average Loss: %0.4f \n" % (epoch_loss / len(training_data)))
+        f.close()
+
+        avg_psnr = 0
+        for data in validation_data:
+            input, label = data
+
+            input = input.to(device)
+            label = label.to(device)
+
+            with torch.no_grad():
+                prediction = model(input)
+                mse = criterion(prediction, label)
+                psnr = 10 * log10(1 / mse.item())
+                avg_psnr += psnr
+        f1.write("Average PSNR of Epoch [%i]: %0.4f dB \n" % (epoch, (avg_psnr / len(training_data))))
+
+        model_name = "epoch_%i_model.pth" % epoch+1
+        torch.save(model, model_name)
+        print("Epoch (%i/%i) is done! See root dir for logs and models" % (epoch+1, args.nEpochs))
+    f1.close()
 
     # |-------------------------------------------------------------------------------------------------| #
     # Until this part, it is very similar to PyTorch-SuperResolution Example on Github

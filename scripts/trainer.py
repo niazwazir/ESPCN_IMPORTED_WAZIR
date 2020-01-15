@@ -37,10 +37,10 @@ def training(cuda_in, seed_in, upscale_in, lr_in, nEpochs_in,
             epoch_loss += loss.item()
             loss.backward()
             optimiser.step()
-            f.write("Iteration [%i/%i]: Loss: %0.4f" % (iteration, len(train_dataset), loss.item()))
+            f.write("Iteration [%i/%i]: Loss: %0.4f \n" % (iteration, len(train_dataset), loss.item()))
             iteration += 1
-        f.write("-"*60)
-        f.write("Average Loss: %0.4f" % (epoch_loss/len(train_dataset)))
+        f.write("-"*60 + "\n")
+        f.write("Average Loss: %0.4f \n" % (epoch_loss/len(train_dataset)))
         f.close()
 
         avg_psnr = 0
@@ -55,7 +55,7 @@ def training(cuda_in, seed_in, upscale_in, lr_in, nEpochs_in,
                 mse = criterion(prediction, label)
                 psnr = 10 * log10(1/mse.item())
                 avg_psnr += psnr
-        f1.write("Average PSNR of Epoch [%i]: %0.4f dB" % (epoch, (avg_psnr/len(train_dataset))))
+        f1.write("Average PSNR of Epoch [%i]: %0.4f dB \n" % (epoch, (avg_psnr/len(train_dataset))))
 
         model_name = "epoch_%i_model.pth" % epoch
         torch.save(model, model_name)
