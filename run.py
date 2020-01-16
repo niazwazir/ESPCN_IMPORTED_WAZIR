@@ -10,12 +10,11 @@ from torch.utils.data import DataLoader
 import torch
 import torch.nn as nn
 import torch.optim as optim
-from scripts.nnet_model import ESPCN
 from math import log10
 
 import scripts.file_process as fp
 from scripts.dataset_maker import set_maker
-from scripts.trainer import training
+from scripts.nnet_model import ESPCN
 
 
 def dir_in_dir(path):
@@ -71,15 +70,12 @@ def main():
 
     print("\n ██████ Loading Data into Dataset ██████")
 
-    train_set = set_maker(train_dir, 244, args.upscale)
-    valid_set = set_maker(valid_dir, 244, args.upscale)
+    train_set = set_maker(train_dir, 51, args.upscale)
+    valid_set = set_maker(valid_dir, 51, args.upscale)
     training_data = DataLoader(dataset=train_set, batch_size=args.trainBatchSize, shuffle=True,
                                num_workers=args.nWorkers)
     validation_data = DataLoader(dataset=valid_set, batch_size=args.validBatchSize, shuffle=True,
                                num_workers=args.nWorkers)
-
-    # training(args.cuda, args.seed, args.upscale, args.lr,args.nEpochs,
-    #          training_data, validation_data)
 
     if args.cuda and not torch.cuda.is_available():
         print("No CUDA supporting GPU found, using CPU")
@@ -141,7 +137,7 @@ def main():
                 mse = criterion(prediction, label)
                 psnr = 10 * log10(1 / mse.item())
                 avg_psnr += psnr
-        f2.write("Average PSNR of Epoch [%i]: %0.4f dB \n" % (epoch+1, (avg_psnr / len(training_data))))
+        f2.write("Average PSNR of Epoch [%i]: %0.4f dB \n" % (epoch+1, (avg_psnr / len(validation_data))))
         f2.close()
 
         model_name = "epoch_%i_model.pth" % (epoch+1)
