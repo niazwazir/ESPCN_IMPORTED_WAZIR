@@ -40,3 +40,15 @@ Crop size: 128
 Datasets: DIV2K_train_LR_unknown_X3.zip and DIV2K_valid_LR_unknown_X3.zip
 Activator func: tanh
 Crop size: 51
+
+[Folder 8] variables and parameters:
+--upscale 3 --trainBatchSize 4 --validBatchSize 100 --nEpochs 30 --lr 0.001 --cuda
+Datasets: DIV2K_train_HR.zip and DIV2K_valid_HR.zip
+Activator func: tanh
+Crop size: 51
+
+[Folder 9] variables and parameters:
+--upscale 3 --trainBatchSize 4 --validBatchSize 100 --nEpochs 30 --lr 0.001 --cuda
+Datasets: DIV2K_train_HR.zip and DIV2K_valid_HR.zip
+Activator func: tanh
+Crop size: 256

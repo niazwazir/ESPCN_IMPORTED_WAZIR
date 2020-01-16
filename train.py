@@ -70,8 +70,8 @@ def main():
 
     print("\n ██████ Loading Data into Dataset ██████")
 
-    train_set = set_maker(train_dir, 51, args.upscale)
-    valid_set = set_maker(valid_dir, 51, args.upscale)
+    train_set = set_maker(train_dir, 256, args.upscale)
+    valid_set = set_maker(valid_dir, 256, args.upscale)
     training_data = DataLoader(dataset=train_set, batch_size=args.trainBatchSize, shuffle=True,
                                num_workers=args.nWorkers)
     validation_data = DataLoader(dataset=valid_set, batch_size=args.validBatchSize, shuffle=True,
