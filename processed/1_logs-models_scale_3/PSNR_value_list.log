@@ -1,30 +1,30 @@
-Average PSNR of Epoch [1]: 0.1302 dB 
-Average PSNR of Epoch [2]: 0.1355 dB 
-Average PSNR of Epoch [3]: 0.1378 dB 
-Average PSNR of Epoch [4]: 0.1387 dB 
-Average PSNR of Epoch [5]: 0.1394 dB 
-Average PSNR of Epoch [6]: 0.1397 dB 
-Average PSNR of Epoch [7]: 0.1402 dB 
-Average PSNR of Epoch [8]: 0.1405 dB 
-Average PSNR of Epoch [9]: 0.1403 dB 
-Average PSNR of Epoch [10]: 0.1407 dB 
-Average PSNR of Epoch [11]: 0.1407 dB 
-Average PSNR of Epoch [12]: 0.1408 dB 
-Average PSNR of Epoch [13]: 0.1409 dB 
-Average PSNR of Epoch [14]: 0.1406 dB 
-Average PSNR of Epoch [15]: 0.1385 dB 
-Average PSNR of Epoch [16]: 0.1411 dB 
-Average PSNR of Epoch [17]: 0.1409 dB 
-Average PSNR of Epoch [18]: 0.1413 dB 
-Average PSNR of Epoch [19]: 0.1411 dB 
-Average PSNR of Epoch [20]: 0.1410 dB 
-Average PSNR of Epoch [21]: 0.1413 dB 
-Average PSNR of Epoch [22]: 0.1414 dB 
-Average PSNR of Epoch [23]: 0.1408 dB 
-Average PSNR of Epoch [24]: 0.1416 dB 
-Average PSNR of Epoch [25]: 0.1411 dB 
-Average PSNR of Epoch [26]: 0.1416 dB 
-Average PSNR of Epoch [27]: 0.1416 dB 
-Average PSNR of Epoch [28]: 0.1417 dB 
-Average PSNR of Epoch [29]: 0.1415 dB 
-Average PSNR of Epoch [30]: 0.1416 dB 
+PSNR of Epoch [1]: 26.04 dB
+PSNR of Epoch [2]: 27.1 dB
+PSNR of Epoch [3]: 27.56 dB
+PSNR of Epoch [4]: 27.74 dB
+PSNR of Epoch [5]: 27.88 dB
+PSNR of Epoch [6]: 27.94 dB
+PSNR of Epoch [7]: 28.04 dB
+PSNR of Epoch [8]: 28.1 dB
+PSNR of Epoch [9]: 28.06 dB
+PSNR of Epoch [10]: 28.14 dB
+PSNR of Epoch [11]: 28.14 dB
+PSNR of Epoch [12]: 28.16 dB
+PSNR of Epoch [13]: 28.18 dB
+PSNR of Epoch [14]: 28.12 dB
+PSNR of Epoch [15]: 27.7 dB
+PSNR of Epoch [16]: 28.22 dB
+PSNR of Epoch [17]: 28.18 dB
+PSNR of Epoch [18]: 28.26 dB
+PSNR of Epoch [19]: 28.22 dB
+PSNR of Epoch [20]: 28.2 dB
+PSNR of Epoch [21]: 28.26 dB
+PSNR of Epoch [22]: 28.28 dB
+PSNR of Epoch [23]: 28.16 dB
+PSNR of Epoch [24]: 28.32 dB
+PSNR of Epoch [25]: 28.22 dB
+PSNR of Epoch [26]: 28.32 dB
+PSNR of Epoch [27]: 28.32 dB
+PSNR of Epoch [28]: 28.34 dB
+PSNR of Epoch [29]: 28.3 dB
+PSNR of Epoch [30]: 28.32 dB
