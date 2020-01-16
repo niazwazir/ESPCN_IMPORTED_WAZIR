@@ -7,7 +7,7 @@ from torchvision.transforms import ToTensor
 
 
 def main():
-    to_upscale = Image.open(args.input_image).convert('YCbCr')
+    to_upscale = Image.open(args.input).convert('YCbCr')
     y, cb, cr = to_upscale.split()
 
     model_in = torch.load(args.model)
@@ -30,8 +30,8 @@ def main():
     out_img_cr = cr.resize(out_img_y.size, Image.BICUBIC)
     out_img = Image.merge('YCbCr', [out_img_y, out_img_cb, out_img_cr]).convert('RGB')
 
-    out_img.save(args.output_filename)
-    print('output image saved to ', args.output_filename)
+    out_img.save(args.output)
+    print('output image saved to ', args.output)
 
 
 

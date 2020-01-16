@@ -3,7 +3,7 @@
 #  // Members: Andres Sánchez, Deniz Alp Atun, Ismail Göktuğ Serin  //////
 #  ///////////////////////////////////////////////////////////////////////
 
-import os.path
+import os
 import argparse
 from torch.utils.data import DataLoader
 
@@ -78,8 +78,8 @@ def main():
     validation_data = DataLoader(dataset=valid_set, batch_size=args.validBatchSize, shuffle=True,
                                num_workers=args.nWorkers)
 
-    #training(args.cuda, args.seed, args.upscale, args.lr,args.nEpochs,
-    #         training_data, validation_data)
+    # training(args.cuda, args.seed, args.upscale, args.lr,args.nEpochs,
+    #          training_data, validation_data)
 
     if args.cuda and not torch.cuda.is_available():
         print("No CUDA supporting GPU found, using CPU")
@@ -94,11 +94,21 @@ def main():
     criterion = nn.MSELoss()
     optimiser = optim.Adam(model.parameters(), lr=args.lr)
 
-    f1 = open("PSNR_value_list.log", 'w')
+    log_path = "logs-models_scale_%i" % args.upscale
+    output_dir = os.path.join(root_dir, log_path)
+    try:
+        os.mkdir(output_dir)
+    except:
+        print("An error occured during mkdir")
+
+    psnr_avg_log = os.path.join(output_dir, "PSNR_value_list.log")
+
     for epoch in range(args.nEpochs):
         epoch_loss = 0
         iteration = 0
-        f = open("epoch_%i.log" % (epoch+1), 'w')
+        epoch_log_path = "epoch_%i.log" % (epoch+1)
+        epoch_log = os.path.join(output_dir, epoch_log_path)
+        f1 = open(epoch_log, 'w')
         for data in training_data:
             input, label = data
 
@@ -112,13 +122,14 @@ def main():
             epoch_loss += loss.item()
             loss.backward()
             optimiser.step()
-            f.write("Iteration [%i/%i]: Loss: %0.4f \n" % (iteration+1, len(training_data), loss.item()))
+            f1.write("Iteration [%i/%i]: Loss: %0.4f \n" % (iteration+1, len(training_data), loss.item()))
             iteration += 1
-        f.write("-----------------------------------\n")
-        f.write("Average Loss: %0.4f \n" % (epoch_loss / len(training_data)))
-        f.close()
+        f1.write("-----------------------------------\n")
+        f1.write("Average Loss: %0.4f \n" % (epoch_loss / len(training_data)))
+        f1.close()
 
         avg_psnr = 0
+        f2 = open(psnr_avg_log, 'a+')
         for data in validation_data:
             input, label = data
 
@@ -130,12 +141,13 @@ def main():
                 mse = criterion(prediction, label)
                 psnr = 10 * log10(1 / mse.item())
                 avg_psnr += psnr
-        f1.write("Average PSNR of Epoch [%i]: %0.4f dB \n" % (epoch+1, (avg_psnr / len(training_data))))
+        f2.write("Average PSNR of Epoch [%i]: %0.4f dB \n" % (epoch+1, (avg_psnr / len(training_data))))
+        f2.close()
 
         model_name = "epoch_%i_model.pth" % (epoch+1)
+        model_name = os.path.join(output_dir, model_name)
         torch.save(model, model_name)
         print("Epoch (%i/%i) is done! See root dir for logs and models" % (epoch+1, args.nEpochs))
-    f1.close()
 
     # |-------------------------------------------------------------------------------------------------| #
     # Until this part, it is very similar to PyTorch-SuperResolution Example on Github
@@ -149,7 +161,6 @@ def main():
     # Next part is modelling a Network with upscale as input, training and validating by using the model,
     # PyTorch ReLU Network (torch.nn), PyTorch Optimiser (torch.optim) and so on...
     # |-------------------------------------------------------------------------------------------------| #
-
 
 
 if __name__ == '__main__':
