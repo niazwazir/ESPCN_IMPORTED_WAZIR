@@ -1,9 +1,6 @@
 import torch.nn as nn
 import torch.nn.functional as fn
 
-# for ESPCN paper shows advantage of tanh
-# one could also test LeakyReLu or Softsign and see which runs better.
-
 
 class ESPCN(nn.Module):
     def __init__(self, upscale, nChannel):

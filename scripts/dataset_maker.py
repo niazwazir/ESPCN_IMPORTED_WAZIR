@@ -7,12 +7,15 @@ from os.path import join
 
 
 class DatasetFromFolder(Dataset):
+    # initialisation of class, image names are stored and transformations are calculated from super
     def __init__(self, data_dir, input_transform=None, target_transform=None):
         super(DatasetFromFolder, self).__init__()
         self.image_names = [join(data_dir, x) for x in listdir(data_dir)]
         self.input_transform = input_transform
         self.target_transform = target_transform
 
+    # for every item, image is converted to YCbCr notation; since Cb and Cr are constants
+    # only Y value is passed to be transformed
     def __getitem__(self, i):
         image, _, _, = Image.open(self.image_names[i]).convert('YCbCr').split()
         target = image.copy()
@@ -46,6 +49,7 @@ def target_transform(crop_size):
     ])
 
 
+# the variables are passed from train.py
 def set_maker(directory, crop_amount, upscale):
     crop_size = round_crop_size(crop_amount, upscale)
     return DatasetFromFolder(directory, input_transform=input_transform(crop_size, upscale),

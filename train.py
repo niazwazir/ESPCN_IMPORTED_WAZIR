@@ -20,19 +20,24 @@ from scripts.nnet_model_leaky import ESPCN as leaky_ESPCN
 from scripts.nnet_model_relu import ESPCN as relu_ESPCN
 
 
+# To determine whether extracted file has sub-directories or not
+# Takes path as an input, requests folder structure as an input
+# Depending on choice returns path
 def dir_in_dir(path):
     print("Does the zip include images on root or inside folder?")
     check = input("Type 1 for yes, 0 for no: ")
     if check:
-        ext_path = input("Type the path until images are seen:\n" )
+        ext_path = input("Type the path until images are seen:" )
         return path, ext_path
     else:
         return path, None
 
 
+# Takes root path and a label as an input, requests for a path to a file as an input
+# After that passes that path to dir_in_dir and returns paths
 def dir_input(root_in, label):
     while True:
-        temp = input("Type in the relative path of %s data set: " % label)
+        temp = input("\nType in the relative path of %s data set: " % label)
         test = os.path.join(root_in, temp)
         print("Path: " + str(test))
         if os.path.isfile(test):
@@ -50,39 +55,48 @@ def main():
     print("Important! Place everything in the same folder, since this code uses relative paths!")
     print("Path input examples: dataset.zip or folder\\dataset.zip")
     print("-------------------------------------------------------\n")
-    root_dir = os.path.realpath('.')
-    train_dirs = dir_input(root_dir, "training")
-    valid_dirs = dir_input(root_dir, "validation")
+    root_dir = os.path.realpath('.')    # save path of root directory
+    train_dirs = dir_input(root_dir, "training")    # ask for training directory
+    valid_dirs = dir_input(root_dir, "validation")  # ask for validation directory
 
+    # the respective directories are passed to file_process.py for zip extraction and further
+    # file/directory management purposes
     train_dir = fp.prep_files(root_dir, train_dirs[0], train_dirs[1], "train")
     valid_dir = fp.prep_files(root_dir, valid_dirs[0], valid_dirs[1], "valid")
 
     print("\n ██████ Loading Data into Dataset ██████")
+    print("-------------------------------------------------------\n")
 
+    # the extracted file sets are passed to a dataset_maker.py for
+    # image loading purposes and transformations and returns a class for further processing
     train_set = set_maker(train_dir, args.cropSize, args.upscale)
     valid_set = set_maker(valid_dir, args.cropSize, args.upscale)
+
+    # further processing is handled by DataLoader function of torch utils to be prepared for usage in tensors
     training_data = DataLoader(dataset=train_set, batch_size=args.trainBatchSize, shuffle=True,
                                num_workers=args.nWorkers)
     validation_data = DataLoader(dataset=valid_set, batch_size=args.validBatchSize, shuffle=True,
                                num_workers=args.nWorkers)
 
+    # checks whether computer supports cuda or not, if it doesn't support sets flag to false
     if args.cuda and not torch.cuda.is_available():
         print("No CUDA supporting GPU found, using CPU")
         cuda_in = False
     else:
         cuda_in = True
 
+    # determines whether a gpu or cpu will be used for tensor
     device = torch.device("cuda" if cuda_in else "cpu")
 
     torch.manual_seed(args.seed)
     if args.func == "leaky":
         model = leaky_ESPCN(args.upscale, 1).to(device)  # 1 is for number of channels
     elif args.func == "relu":
-        model = relu_ESPCN(args.upscale, 1).to(device)  # 1 is for number of channels
+        model = relu_ESPCN(args.upscale, 1).to(device)
     else:
-        model = tanh_ESPCN(args.upscale, 1).to(device)  # 1 is for number of channels
-    criterion = nn.MSELoss()
-    optimiser = optim.Adam(model.parameters(), lr=args.lr)
+        model = tanh_ESPCN(args.upscale, 1).to(device)
+    criterion = nn.MSELoss()    # calculates Mean Square Error between elements of inputs and targets
+    optimiser = optim.Adam(model.parameters(), lr=args.lr)  # optimiser algorithm
 
     log_path = "logs_scale_%i_crop_%i" % (args.upscale, args.cropSize)
     output_dir = os.path.join(root_dir, log_path)
@@ -93,21 +107,25 @@ def main():
 
     psnr_log = os.path.join(output_dir, "PSNR_value_list.log")
 
+    # training and saving models that will upscale images
     for epoch in range(args.nEpochs):
         epoch_loss = 0
         iteration = 0
         epoch_log_path = "epoch_%i.log" % (epoch+1)
         epoch_log = os.path.join(output_dir, epoch_log_path)
         f1 = open(epoch_log, 'w')
+        # this step trains the defined model with the given images
         for data in training_data:
+            # input contains image that has been cropped and downscaled
+            # label contains image that has been only cropped; aka the target of transformation
             input, label = data
 
             input = input.to(device)
             label = label.to(device)
 
-            loss = criterion(model(input), label)
+            loss = criterion(model(input), label)   # calculation of loss wrt current epoch model
 
-            optimiser.zero_grad()
+            optimiser.zero_grad()   # clearing gradients for next iteration
 
             epoch_loss += loss.item()
             loss.backward()
@@ -120,6 +138,7 @@ def main():
 
         tot_psnr = 0
         f2 = open(psnr_log, 'a+')
+        # a validation of how the trained model is performing (over-fitting, under-achieving etc.)
         for data in validation_data:
             input, label = data
 
@@ -141,19 +160,6 @@ def main():
 
     temp = os.path.join(root_dir,"extr")
     rmtree(temp, ignore_errors=True)
-
-    # |-------------------------------------------------------------------------------------------------| #
-    # Until this part, it is very similar to PyTorch-SuperResolution Example on Github
-    # Link: https://github.com/pytorch/examples/tree/master/super_resolution
-    # Changes are the way to acquire data files, their relative directory and how they are
-    # passed to the code. Unlike other solutions, data is dynamically passed (by asking for input)
-    # Rest of the code shows similarity since deviating from the example either resulted in
-    # poor code readability, making an unnecessary wall of text or using additional libraries
-    # such as h5py, numpy and etc.
-    # |-------------------------------------------------------------------------------------------------| #
-    # Next part is modelling a Network with upscale as input, training and validating by using the model,
-    # PyTorch ReLU Network (torch.nn), PyTorch Optimiser (torch.optim) and so on...
-    # |-------------------------------------------------------------------------------------------------| #
 
 
 if __name__ == '__main__':
