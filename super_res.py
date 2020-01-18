@@ -32,7 +32,7 @@ def main():
     out_img_cr = cr.resize(out_img_y.size, Image.BICUBIC)
     out_img = Image.merge('YCbCr', [out_img_y, out_img_cb, out_img_cr]).convert('RGB')
 
-    if args.compare is not None:
+    if args.compare is not "None":
         to_compare = Image.open(args.compare).convert('YCbCr')
         y_comp, _, _ = to_compare.split()
         y_compare = np.array(y_comp)
@@ -53,7 +53,7 @@ def main():
 if __name__ == '__main__':
     parser = argparse.ArgumentParser(description="DRRA Project")
     parser.add_argument('--input', type=str, required=True)
-    parser.add_argument('--compare', type=str, default=None)
+    parser.add_argument('--compare', type=str, default="None")
     parser.add_argument('--model', type=str, required=True)
     parser.add_argument('--output', type=str, required=True)
     parser.add_argument('--cuda', action='store_true', help="enable cuda?")

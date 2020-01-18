@@ -53,18 +53,3 @@ Crop size: 128
 Datasets: DIV2K_train_LR_unknown_X3.zip and DIV2K_valid_LR_unknown_X3.zip
 Activator func: leaky_relu 0.01
 Crop size: 64
-
-
------------- Not controlled test sets with respect to best results
-
-[Folder 11] variables and parameters:
---upscale 3 --trainBatchSize 4 --validBatchSize 100 --nEpochs 30 --cropSize 64 --lr 0.001 --cuda
-Datasets: DIV2K_train_LR_bicubic_X3.zip and DIV2K_valid_LR_bicubic_X3.zip
-Activator func: tanh
-Crop size: 64
-
-[Folder 12] variables and parameters:
---upscale 3 --trainBatchSize 4 --validBatchSize 100 --nEpochs 30 --cropSize 64 --lr 0.001 --cuda
-Datasets: DIV2K_train_HR.zip and DIV2K_valid_HR.zip
-Activator func: tanh
-Crop size: 64

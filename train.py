@@ -27,7 +27,7 @@ def dir_in_dir(path):
     print("Does the zip include images on root or inside folder?")
     check = input("Type 1 for yes, 0 for no: ")
     if check:
-        ext_path = input("Type the path until images are seen:" )
+        ext_path = input("Type the path until images are seen: " )
         return path, ext_path
     else:
         return path, None
