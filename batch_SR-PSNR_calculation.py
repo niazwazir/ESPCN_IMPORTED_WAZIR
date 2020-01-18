@@ -2,12 +2,22 @@ import os
 import argparse
 import torch
 import numpy as np
+from shutil import rmtree
 from math import log10
 from PIL import Image
 from torchvision.transforms import ToTensor
 
 import scripts.file_process as fp
 
+
+def progressBar(index, total):
+    fill = '█'
+    percentage = ("{0:.1f}").format(100 * (index/float(total)))
+    complen = int(100 * index // total)
+    bar = fill * complen + '-' * (100 - complen)
+    print('\r|%s| %s%% %s' % (bar, percentage,"Complete!"), end='\r')
+    if index == total:
+        print()
 
 
 def dir_in_dir(path):
@@ -46,7 +56,13 @@ def main():
     origin_dirs = batch_dir_input(root_dir)
     origin_dir = fp.prep_files(root_dir, origin_dirs[0], origin_dirs[1], "origin")
 
+    i = 0
+    tot = len(os.listdir(origin_dir))
+
     for origin_img in os.scandir(origin_dir):
+        i += 1
+        progressBar(i,tot)
+
         to_compare = Image.open(origin_img.path).convert('YCbCr')
         y_org, _, _ = to_compare.split()
         y_org = np.array(y_org)
@@ -80,6 +96,8 @@ def main():
         psnr_name = os.path.join(output_dir, "PSNR_logs.log")
         try:
             os.mkdir(output_dir)
+        except:
+            pass
         f1 = open(psnr_name, 'a+')
         mse = np.mean((y_org - y_comp) **2)
         if mse == 0:
@@ -87,7 +105,7 @@ def main():
         else:
             PIXEL_MAX = 255.0
             psnr = 20 * log10(PIXEL_MAX / np.sqrt(mse))
-        f1.write("PSNR for " + image.name[:-4] + ": " + str(psnr))
+        f1.write("PSNR for " + image.name[:-4] + ": " + str(psnr) + "\n")
         f1.close()
 
         out_img_cb = cb.resize(out_img_y.size, Image.BICUBIC)
@@ -97,6 +115,11 @@ def main():
         output_name = image.name[:-4] + "_SR" + image.name[-4:]
         out_name = os.path.join(output_dir, output_name)
         out_img.save(out_name)
+
+    temp = os.path.join(root_dir, "extr")
+    rmtree(temp, ignore_errors=True)
+    print("SR task is done!")
+
 
 
 if __name__ == '__main__':

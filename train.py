@@ -5,6 +5,7 @@
 
 import os
 import argparse
+from shutil import rmtree
 from torch.utils.data import DataLoader
 
 import torch
@@ -14,7 +15,9 @@ from math import log10
 
 import scripts.file_process as fp
 from scripts.dataset_maker import set_maker
-from scripts.nnet_model import ESPCN
+from scripts.nnet_model_tanh import ESPCN as tanh_ESPCN
+from scripts.nnet_model_leaky import ESPCN as leaky_ESPCN
+from scripts.nnet_model_relu import ESPCN as relu_ESPCN
 
 
 def dir_in_dir(path):
@@ -27,31 +30,17 @@ def dir_in_dir(path):
         return path, None
 
 
-def train_dir_input(root_in):
+def dir_input(root_in, label):
     while True:
-        temp = input("Type in the relative path of training data set: ")
+        temp = input("Type in the relative path of %s data set: " % label)
         test = os.path.join(root_in, temp)
         print("Path: " + str(test))
         if os.path.isfile(test):
-            train_path = test
+            path_in = test
             break
         else:
             print("Path doesn't end with a file!")
-    extr_path, folder_path = dir_in_dir(train_path)
-    return extr_path, folder_path
-
-
-def valid_dir_input(root_in):
-    while True:
-        temp = input("Type in the relative path of validation data set: ")
-        test = os.path.join(root_in, temp)
-        print("Path: " + str(test))
-        if os.path.isfile(test):
-            valid_path = test
-            break
-        else:
-            print("Path doesn't end with a file!")
-    extr_path, folder_path = dir_in_dir(valid_path)
+    extr_path, folder_path = dir_in_dir(path_in)
     return extr_path, folder_path
 
 
@@ -62,16 +51,16 @@ def main():
     print("Path input examples: dataset.zip or folder\\dataset.zip")
     print("-------------------------------------------------------\n")
     root_dir = os.path.realpath('.')
-    train_dirs = train_dir_input(root_dir)
-    valid_dirs = valid_dir_input(root_dir)
+    train_dirs = dir_input(root_dir, "training")
+    valid_dirs = dir_input(root_dir, "validation")
 
     train_dir = fp.prep_files(root_dir, train_dirs[0], train_dirs[1], "train")
     valid_dir = fp.prep_files(root_dir, valid_dirs[0], valid_dirs[1], "valid")
 
     print("\n ██████ Loading Data into Dataset ██████")
 
-    train_set = set_maker(train_dir, 256, args.upscale)
-    valid_set = set_maker(valid_dir, 256, args.upscale)
+    train_set = set_maker(train_dir, args.cropSize, args.upscale)
+    valid_set = set_maker(valid_dir, args.cropSize, args.upscale)
     training_data = DataLoader(dataset=train_set, batch_size=args.trainBatchSize, shuffle=True,
                                num_workers=args.nWorkers)
     validation_data = DataLoader(dataset=valid_set, batch_size=args.validBatchSize, shuffle=True,
@@ -86,11 +75,16 @@ def main():
     device = torch.device("cuda" if cuda_in else "cpu")
 
     torch.manual_seed(args.seed)
-    model = ESPCN(args.upscale, 1).to(device)  # 1 is for number of channels
+    if args.func == "leaky":
+        model = leaky_ESPCN(args.upscale, 1).to(device)  # 1 is for number of channels
+    elif args.func == "relu":
+        model = relu_ESPCN(args.upscale, 1).to(device)  # 1 is for number of channels
+    else:
+        model = tanh_ESPCN(args.upscale, 1).to(device)  # 1 is for number of channels
     criterion = nn.MSELoss()
     optimiser = optim.Adam(model.parameters(), lr=args.lr)
 
-    log_path = "logs-models_scale_%i" % args.upscale
+    log_path = "logs_scale_%i_crop_%i" % (args.upscale, args.cropSize)
     output_dir = os.path.join(root_dir, log_path)
     try:
         os.mkdir(output_dir)
@@ -145,6 +139,9 @@ def main():
         torch.save(model, model_name)
         print("Epoch (%i/%i) is done! See root dir for logs and models" % (epoch+1, args.nEpochs))
 
+    temp = os.path.join(root_dir,"extr")
+    rmtree(temp, ignore_errors=True)
+
     # |-------------------------------------------------------------------------------------------------| #
     # Until this part, it is very similar to PyTorch-SuperResolution Example on Github
     # Link: https://github.com/pytorch/examples/tree/master/super_resolution
@@ -167,6 +164,9 @@ if __name__ == '__main__':
     parser.add_argument('--nEpochs', type=int, required=True, help="number of epochs")
     parser.add_argument('--nWorkers', type=int, default=8, help="number of workers")
     parser.add_argument('--lr', type=float, required=True, help="learning rate")
+    parser.add_argument('--cropSize', type=int, required=True, default=128, help="crop size")
+    parser.add_argument('--func', type=str, required=True, default="tanh", help="choose a activator function: tanh, "
+                                                                                "relu, leaky")
     parser.add_argument('--cuda', action='store_true', help="enable cuda?")
     parser.add_argument('--seed', type=int, default=42, help="random seed to use. Default=42")
     args = parser.parse_args()
