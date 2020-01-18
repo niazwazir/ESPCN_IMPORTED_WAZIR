@@ -12,7 +12,7 @@ Iteration [11/200]: Loss: 0.0011
 Iteration [12/200]: Loss: 0.0014 
 Iteration [13/200]: Loss: 0.0008 
 Iteration [14/200]: Loss: 0.0010 
-Iteration [15/200]: Loss: 0.0010 
+Iteration [15/200]: Loss: 0.0009 
 Iteration [16/200]: Loss: 0.0018 
 Iteration [17/200]: Loss: 0.0011 
 Iteration [18/200]: Loss: 0.0014 
@@ -33,9 +33,9 @@ Iteration [32/200]: Loss: 0.0017
 Iteration [33/200]: Loss: 0.0024 
 Iteration [34/200]: Loss: 0.0015 
 Iteration [35/200]: Loss: 0.0012 
-Iteration [36/200]: Loss: 0.0015 
+Iteration [36/200]: Loss: 0.0014 
 Iteration [37/200]: Loss: 0.0016 
-Iteration [38/200]: Loss: 0.0018 
+Iteration [38/200]: Loss: 0.0017 
 Iteration [39/200]: Loss: 0.0017 
 Iteration [40/200]: Loss: 0.0021 
 Iteration [41/200]: Loss: 0.0021 
@@ -72,8 +72,8 @@ Iteration [71/200]: Loss: 0.0013
 Iteration [72/200]: Loss: 0.0012 
 Iteration [73/200]: Loss: 0.0013 
 Iteration [74/200]: Loss: 0.0016 
-Iteration [75/200]: Loss: 0.0013 
-Iteration [76/200]: Loss: 0.0009 
+Iteration [75/200]: Loss: 0.0012 
+Iteration [76/200]: Loss: 0.0008 
 Iteration [77/200]: Loss: 0.0027 
 Iteration [78/200]: Loss: 0.0018 
 Iteration [79/200]: Loss: 0.0018 
