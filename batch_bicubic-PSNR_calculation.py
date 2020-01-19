@@ -88,16 +88,9 @@ def main():
         y, cb, cr = to_upscale.split()
         y_comp = np.array(y)
 
-        # creation of a directory to store SR images and log file
-        output_dir = os.path.join(root_dir, "SR_results")
-        psnr_name = os.path.join(output_dir, "PSNR_logs.log")
-        try:
-            os.mkdir(output_dir)
-        except:
-            pass
 
         # creates a log file within the given path and stores PSNR value accordingly
-        f1 = open(psnr_name, 'a+')
+        f1 = open("PSNR_bicubic_logs.log", 'a+')
         mse = np.mean((y_org - y_comp) **2)
         if mse == 0:
             psnr = 100
