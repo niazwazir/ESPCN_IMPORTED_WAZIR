@@ -1,0 +1,17 @@
+[ Baboon, Anime, Monarch ]
+Trained with x3 bicubic set of DIV2K
+
+Leaky:
+Baboon: PSNR of output wrt compared is: 21.946371643357665
+Anime: PSNR of output wrt compared is: 22.543782783622532
+Monarch PSNR of output wrt compared is: 29.709751262818344
+
+Relu:
+Baboon: PSNR of output wrt compared is: 21.95242559340457
+Anime: PSNR of output wrt compared is: 22.44096951261364
+Monarch PSNR of output wrt compared is: 29.360569127237813
+
+Tanh:
+Baboon: PSNR of output wrt compared is: 21.897692024203877
+Anime: PSNR of output wrt compared is: 22.383386596682833
+Monarch PSNR of output wrt compared is: 29.116545331205227
